@@ -1,47 +1,29 @@
 services:
-  # Service Laravel dengan FrankenPHP
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: laravel-frankenphp
+    build: .
     container_name: laravel_app
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
-      - "443:443/udp"
+    environment:
+      - SERVER_NAME=:80
     volumes:
       - .:/app
       - caddy_data:/data
       - caddy_config:/config
-    environment:
-      - APP_ENV=production
-      - APP_KEY=${APP_KEY}
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - SERVER_NAME=:80 # Ganti dengan domain Anda (misal: example.com) untuk SSL otomatis
     depends_on:
       - db
 
-  # Service Database MySQL
   db:
     image: mysql:8.0
     container_name: laravel_db
     restart: always
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: iot_db
+      MYSQL_ROOT_PASSWORD: root
     volumes:
       - db_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
 
 volumes:
   db_data:
