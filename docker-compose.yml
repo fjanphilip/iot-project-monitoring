@@ -1,21 +1,49 @@
 services:
-  # Nama layanan Anda (misalnya: web-app, backend, database)
-  my_app:
-    # Perintah ini memberitahu Docker Compose untuk
-    # membangun image menggunakan Dockerfile yang ada di
-    # konteks (path) yang ditentukan.
+  # Service Laravel dengan FrankenPHP
+  app:
     build:
-      # Titik (`.`) menunjukkan direktori konteks build adalah
-      # direktori saat ini, di mana docker-compose.yml berada.
       context: .
-
-    # Opsional: Tentukan port mapping (HOST_PORT:CONTAINER_PORT)
-    ports:
-      - "8000:8000"
-
-    env_file:
-      - .env
-
-    volumes:
-      - ./.env:/var/www/html/.env:ro
+      dockerfile: Dockerfile
+    image: laravel-frankenphp
+    container_name: laravel_app
     restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - .:/app
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - APP_ENV=production
+      - APP_KEY=${APP_KEY}
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SERVER_NAME=:80 # Ganti dengan domain Anda (misal: example.com) untuk SSL otomatis
+    depends_on:
+      - db
+
+  # Service Database MySQL
+  db:
+    image: mysql:8.0
+    container_name: laravel_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:
