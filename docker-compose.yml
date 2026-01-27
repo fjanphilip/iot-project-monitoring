@@ -1,8 +1,15 @@
 services:
+  # Nama layanan Anda (misalnya: web-app, backend, database)
   my_app:
+    # Perintah ini memberitahu Docker Compose untuk
+    # membangun image menggunakan Dockerfile yang ada di
+    # konteks (path) yang ditentukan.
     build:
+      # Titik (`.`) menunjukkan direktori konteks build adalah
+      # direktori saat ini, di mana docker-compose.yml berada.
       context: .
-    container_name: laravel_app
+
+    # Opsional: Tentukan port mapping (HOST_PORT:CONTAINER_PORT)
     ports:
       - "8000:8000"
 
@@ -10,9 +17,5 @@ services:
       - .env
 
     volumes:
-      - .:/var/www/html
       - ./.env:/var/www/html/.env:ro
-
-    command: php artisan serve --host=0.0.0.0 --port=8000
-
     restart: unless-stopped
