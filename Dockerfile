@@ -1,28 +1,56 @@
-FROM dunglas/frankenphp:1-php8.4
+# Stage 1: Builder - Compile dependencies
+FROM php:8.3-fpm-alpine AS builder
 
-# 1. Install dependencies dasar & PHP extensions (Tanpa Node.js!)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git unzip curl libzip-dev libicu-dev \
-    libpng-dev libjpeg-dev libfreetype6-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    git curl composer \
+    libzip-dev libpng-dev libjpeg-turbo-dev libfreetype-dev libicu-dev
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j1 gd pcntl bcmath zip pdo_mysql intl sockets
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) gd pcntl bcmath zip pdo_mysql intl sockets
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --prefer-dist
+
+# Stage 2: Production - Minimal image
+FROM php:8.3-fpm-alpine
+
+# Install runtime dependencies only
+RUN apk add --no-cache \
+    libzip libpng libjpeg-turbo libfreetype libicu nginx curl supervisor
+
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) gd pcntl bcmath zip pdo_mysql intl sockets
+
+# Copy PHP configuration
+COPY php.ini /usr/local/etc/php/conf.d/laravel.ini
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY supervisord.conf /etc/supervisord.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 WORKDIR /app
 
-# 2. Install PHP Dependencies
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+# Copy vendor dari builder stage
+COPY --from=builder --chown=www-data:www-data /app/vendor ./vendor
 
-# 3. Salin seluruh kode aplikasi (Termasuk folder public/build yang sudah Anda kirim)
-COPY . .
+# Copy application code
+COPY --chown=www-data:www-data . .
 
-# 4. Bersihkan cache & set permission
-RUN rm -rf bootstrap/cache/*.php && \
-    chown -R www-data:www-data storage bootstrap/cache
+# Create storage directories
+RUN mkdir -p \
+    bootstrap/cache \
+    storage/app/{private,public} \
+    storage/framework/{cache,sessions,testing,views} \
+    storage/logs && \
+    chmod -R 755 bootstrap/cache storage
 
-ENV FRANKENPHP_CONFIG="worker ./public/index.php"
-EXPOSE 80
+# Expose ports
+EXPOSE 9000 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost/health || exit 1
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
