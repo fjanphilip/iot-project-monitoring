@@ -4,35 +4,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: laravel_app
-    restart: unless-stopped
-    working_dir: /app
     ports:
-      - "80:80"
-      - "9000:9000"
-    environment:
-      - APP_NAME=IoT_Project
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_URL=http://localhost
-      - LOG_CHANNEL=single
-      - LOG_LEVEL=info
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=iot_db
-      - DB_USERNAME=laravel
-      - DB_PASSWORD=laravel_secret
-      - QUEUE_CONNECTION=database
-      - CACHE_DRIVER=file
-      - SESSION_DRIVER=cookie
+      - 8000:8000
+    env_file:
+      - .env
     volumes:
-      - ./storage:/app/storage
-      - ./bootstrap/cache:/app/bootstrap/cache
-    depends_on:
-      db:
-        condition: service_healthy
+      - ./.env:/var/www/html/.env:ro
+    restart: unless-stopped
     networks:
-      - app_network
+      - shared-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
@@ -42,33 +22,6 @@ services:
     mem_limit: 512m
     memswap_limit: 512m
 
-  db:
-    image: mysql:8.0
-    container_name: laravel_db
-    restart: always
-    environment:
-      MYSQL_DATABASE: iot_db
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: laravel_secret
-      MYSQL_ROOT_PASSWORD: root_secret
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - app_network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    mem_limit: 256m
-    memswap_limit: 256m
-    command: --default-authentication-plugin=mysql_native_password --max_connections=50 --max_allowed_packet=16m
-
-volumes:
-  db_data:
-    driver: local
-
 networks:
-  app_network:
-    driver: bridge
+  shared-network:
+    external: true

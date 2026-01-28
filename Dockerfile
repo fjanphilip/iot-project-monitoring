@@ -1,56 +1,90 @@
-# Stage 1: Builder - Compile dependencies
-FROM php:8.3-fpm-alpine AS builder
+FROM dunglas/frankenphp:1.11-builder-php8.4.17
 
-RUN apk add --no-cache \
-    git curl composer \
-    libzip-dev libpng-dev libjpeg-turbo-dev libfreetype-dev libicu-dev
+# Set Caddy server name to "http://" to serve on 80 and not 443
+# Read more: https://frankenphp.dev/docs/config/#environment-variables
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install -j$(nproc) gd pcntl bcmath zip pdo_mysql intl sockets
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    git \
+    unzip \
+    librabbitmq-dev \
+    libpq-dev \
+    supervisor \
+    cron \
+    rsyslog
 
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --prefer-dist
+RUN install-php-extensions \
+    gd \
+    pcntl \
+    intl \
+    opcache \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    redis \
+    sodium \
+    zip \
+    sockets
 
-# Stage 2: Production - Minimal image
-FROM php:8.3-fpm-alpine
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Install runtime dependencies only
-RUN apk add --no-cache \
-    libzip libpng libjpeg-turbo libfreetype libicu nginx curl supervisor
+WORKDIR /var/www/html
+
+# Copy the Laravel application files into the container.
+COPY . .
+
+# Start with base PHP config, then add extensions.
+COPY ./.docker/php/php.ini /usr/local/etc/php/
+COPY ./.docker/etc/supervisor.d/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY ./.docker/etc/cron.d/laravel-cron /etc/cron.d/laravel-cron
+
+# Set permission cron file
+RUN chmod 0644 /etc/cron.d/laravel-cron
+
+# Create log directory and files
+RUN mkdir -p /var/log/laravel
+RUN touch /var/log/cron.log
+RUN touch /var/log/laravel/scheduler.log
+RUN chown -R www-data:www-data /var/log/laravel
+
+# Configure rsyslog untuk cron logging
+RUN echo 'cron.*                          /var/log/cron.log' >> /etc/rsyslog.conf
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install -j$(nproc) gd pcntl bcmath zip pdo_mysql intl sockets
+RUN pecl install xdebug
 
-# Copy PHP configuration
-COPY php.ini /usr/local/etc/php/conf.d/laravel.ini
-COPY www.conf /usr/local/etc/php-fpm.d/www.conf
-COPY supervisord.conf /etc/supervisord.conf
-COPY nginx.conf /etc/nginx/nginx.conf
+# Install Laravel dependencies using Composer.
+RUN composer install --ignore-platform-req=ext-intl
 
-WORKDIR /app
+# Install laravel octane
+RUN composer require laravel/octane
 
-# Copy vendor dari builder stage
-COPY --from=builder --chown=www-data:www-data /app/vendor ./vendor
+# Install Franken
+RUN php artisan octane:install --server=frankenphp
 
-# Copy application code
-COPY --chown=www-data:www-data . .
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
 
-# Create storage directories
-RUN mkdir -p \
-    bootstrap/cache \
-    storage/app/{private,public} \
-    storage/framework/{cache,sessions,testing,views} \
-    storage/logs && \
-    chmod -R 755 bootstrap/cache storage
+# Install frontend dependencies and build assets
+ENV VITE_ASSET_URL=http://localhost
+RUN npm install --include=dev
+RUN npm run build
 
-# Expose ports
-EXPOSE 9000 80
+# Run refresh
+#RUN php artisan cache:clear
+RUN php artisan config:clear
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost/health || exit 1
+# Enable PHP extensions
+RUN docker-php-ext-enable xdebug
 
-ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# Set permissions for Laravel.
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+EXPOSE 80 443
+
+# Apply the cron job
+RUN crontab /etc/cron.d/laravel-cron
+
+# Start Supervisor.
+CMD ["/usr/bin/supervisord", "-c",  "/etc/supervisor/conf.d/supervisord.conf"]
