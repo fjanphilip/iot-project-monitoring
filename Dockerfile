@@ -1,39 +1,39 @@
-FROM dunglas/frankenphp:1-php8.3
+FROM dunglas/frankenphp:1-php8.4
 
-# 1. Install dependencies sistem & ekstensi PHP yang dibutuhkan Laravel
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    unzip \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-        gd \
-        pcntl \
-        bcmath \
-        zip \
-        pdo_mysql
+# Install basic tools & PHP extensions (Pecah per layer agar hemat RAM saat build)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git unzip curl libzip-dev libicu-dev \
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# 2. Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j1 gd
 
-# 3. Set Working Directory
+RUN docker-php-ext-install -j1 pcntl bcmath zip pdo_mysql intl sockets
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# 4. Salin file aplikasi
+# Copy dependency files
+COPY composer.json composer.lock package.json package-lock.json ./
+
+# Install Composer tanpa dev (Hemat RAM)
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+
+# Install NPM & Build (Langkah paling berat, Swap sangat dibutuhkan di sini)
+RUN npm install && npm run build && rm -rf node_modules
+
+# Copy sisa file
 COPY . .
 
-# 5. Install dependencies Laravel (tanpa dev untuk produksi)
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Bersihkan sampah cache yang mungkin terbawa
+RUN rm -rf bootstrap/cache/*.php && \
+    chown -R www-data:www-data storage bootstrap/cache
 
-# 6. Atur permissions agar webserver bisa menulis ke storage/cache
-RUN chown -R www-data:www-data storage bootstrap/cache
-
-# 7. Aktifkan mode worker FrankenPHP untuk performa maksimal (Opsional tapi disarankan)
 ENV FRANKENPHP_CONFIG="worker ./public/index.php"
-
-# Ekspos port 80 dan 443
 EXPOSE 80
-EXPOSE 443
-EXPOSE 443/udp
