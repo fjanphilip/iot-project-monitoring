@@ -10,30 +10,14 @@ class SensorController extends Controller
 {
     public function store(Request $request)
     {
-        // Cek data terakhir
-        $latestSensor = Sensor::latest('created_at')->first();
-
-        if ($latestSensor) {
-            // Hitung selisih waktu dalam detik menggunakan created_at
-            $timeDifference = $latestSensor->created_at->diffInSeconds(now());
-
-            // Jika kurang dari 60 detik (1 menit), skip request
-            if ($timeDifference < 60) {
-                return response()->json([
-                    'message' => 'Please wait before sending new data',
-                    'wait_seconds' => 60 - $timeDifference
-                ], 429); // 429 Too Many Requests
-            }
-        }
-
         // Validasi data
         $validated = $request->validate([
-            'temperature'   => 'required|numeric',
-            'air_humidity'  => 'required|numeric',
+            'temperature' => 'required|numeric',
+            'air_humidity' => 'required|numeric',
             'soil_moisture' => 'required|numeric',
-            'fan_pwm'       => 'required|integer|min:0|max:255',
-            'pump_pwm'      => 'required|integer|min:0|max:255',
-            'uv_lamp'       => 'required|string'
+            'fan_pwm' => 'required|integer|min:0|max:255',
+            'pump_pwm' => 'required|integer|min:0|max:255',
+            'uv_lamp' => 'required|string'
         ]);
 
         Sensor::create($validated);
