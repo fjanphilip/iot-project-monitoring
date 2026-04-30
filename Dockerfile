@@ -54,7 +54,7 @@ RUN echo 'cron.*                          /var/log/cron.log' >> /etc/rsyslog.con
 RUN pecl install xdebug
 
 # Install Laravel dependencies using Composer.
-RUN composer install --ignore-platform-req=ext-intl
+RUN composer install --no-dev --ignore-platform-req=ext-intl
 
 # Install laravel octane
 RUN composer require laravel/octane
