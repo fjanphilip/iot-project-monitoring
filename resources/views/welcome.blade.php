@@ -152,7 +152,8 @@
                 </p>
             </div>
             <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 px-4 py-2.5 rounded-xl border border-green-500/30">
+                <div
+                    class="flex items-center gap-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 px-4 py-2.5 rounded-xl border border-green-500/30">
                     <div class="w-2.5 h-2.5 bg-green-500 rounded-full pulse-dot"></div>
                     <span class="text-green-400 text-sm font-semibold">LIVE</span>
                 </div>
@@ -173,12 +174,14 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 <!-- Fan -->
-                <div class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
+                <div
+                    class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
                     <div class="flex items-center justify-between">
                         <div class="flex-1 flex items-center gap-3 mb-3">
                             <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
                                 id="fan-container" style="background: rgba(71,85,105,0.4);">
-                                <i class="fas fa-fan text-2xl text-gray-500 transition-all duration-300" id="fan-icon"></i>
+                                <i class="fas fa-fan text-2xl text-gray-500 transition-all duration-300"
+                                    id="fan-icon"></i>
                             </div>
                             <div>
                                 <p class="text-gray-400 text-xs font-medium uppercase tracking-wider">Exhaust Fan</p>
@@ -195,12 +198,14 @@
                 </div>
 
                 <!-- Pump -->
-                <div class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
+                <div
+                    class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
                     <div class="flex items-center justify-between">
                         <div class="flex-1 flex items-center gap-3 mb-3">
                             <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
                                 id="pump-container" style="background: rgba(71,85,105,0.4);">
-                                <i class="fas fa-water text-2xl text-gray-500 transition-all duration-300" id="pump-icon"></i>
+                                <i class="fas fa-water text-2xl text-gray-500 transition-all duration-300"
+                                    id="pump-icon"></i>
                             </div>
                             <div>
                                 <p class="text-gray-400 text-xs font-medium uppercase tracking-wider">Water Pump</p>
@@ -217,12 +222,14 @@
                 </div>
 
                 <!-- UV Lamp -->
-                <div class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
+                <div
+                    class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
                     <div class="flex items-center justify-between">
                         <div class="flex-1 flex items-center gap-3 mb-3">
                             <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
                                 id="lamp-container" style="background: rgba(71,85,105,0.4);">
-                                <i class="far fa-lightbulb text-2xl text-gray-500 transition-all duration-300" id="lamp-icon"></i>
+                                <i class="far fa-lightbulb text-2xl text-gray-500 transition-all duration-300"
+                                    id="lamp-icon"></i>
                             </div>
                             <div>
                                 <p class="text-gray-400 text-xs font-medium uppercase tracking-wider">UV Lamp</p>
@@ -250,9 +257,11 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 <!-- Temperature -->
-                <div class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
+                <div
+                    class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
                     <div class="flex items-center justify-between mb-5">
-                        <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30">
+                        <div
+                            class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30">
                             <i class="fas fa-temperature-three-quarters text-2xl text-red-400"></i>
                         </div>
                         <div class="text-right">
@@ -265,14 +274,16 @@
                     </div>
                     <div class="flex items-center gap-2 text-xs text-gray-500">
                         <i class="fas fa-circle text-[6px]"></i>
-                        <span>DHT22 Reading</span>
+                        <span>SHT20 Reading</span>
                     </div>
                 </div>
 
                 <!-- Air Humidity -->
-                <div class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
+                <div
+                    class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
                     <div class="flex items-center justify-between mb-5">
-                        <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30">
+                        <div
+                            class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30">
                             <i class="fas fa-droplet text-2xl text-blue-400"></i>
                         </div>
                         <div class="text-right">
@@ -290,14 +301,17 @@
                 </div>
 
                 <!-- Soil Moisture -->
-                <div class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
+                <div
+                    class="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl card-hover">
                     <div class="flex items-center justify-between mb-5">
-                        <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+                        <div
+                            class="w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
                             <img src="{{ asset('assets/soil_sensor.png') }}" alt="Soil Sensor"
                                 class="w-8 h-8 filter invert sepia saturate-[500%] hue-rotate-[260deg]">
                         </div>
                         <div class="text-right">
-                            <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Soil Moisture</p>
+                            <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Soil Moisture
+                            </p>
                             <div class="flex items-baseline justify-end gap-1">
                                 <p class="text-4xl font-bold text-white" id="soil_moisture">-</p>
                                 <span class="text-purple-400 text-lg font-semibold">%</span>
@@ -314,7 +328,8 @@
         </div>
 
         <!-- Footer -->
-        <div class="bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-700/30 shadow-lg">
+        <div
+            class="bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-2xl p-5 border border-slate-700/30 shadow-lg">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 text-sm">
                 <div class="flex items-center gap-3 text-gray-400">
                     <i class="far fa-clock text-lg"></i>
@@ -467,9 +482,24 @@
                 // Update sensors
                 updateSensors(data.temperature || "-", data.air_humidity || "-", data.soil_moisture || "-");
 
-                // Update time
-                const now = new Date();
-                document.getElementById("time").textContent = now.toLocaleString();
+                // --- PERBAIKAN LOGIKA WAKTU DATABASE ---
+                if (data && data.created_at) {
+                    const dbTime = new Date(data.created_at);
+
+                    // Memastikan hasil konversi Date valid (bukan Invalid Date)
+                    if (!isNaN(dbTime.getTime())) {
+                        document.getElementById("time").textContent = dbTime.toLocaleString('id-ID', {
+                            dateStyle: 'medium',
+                            timeStyle: 'medium'
+                        });
+                    } else {
+                        document.getElementById("time").textContent = "Format Waktu Salah";
+                    }
+                } else {
+                    // Jika mikrokontroler mati dan API tidak mengirim properti created_at
+                    document.getElementById("time").textContent = "Sensor Offline / No Data";
+                }
+
             } catch (err) {
                 console.error("Failed to fetch data:", err);
             }
