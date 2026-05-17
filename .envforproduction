@@ -1,0 +1,20 @@
+APP_NAME=iot-project
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=http://103.247.11.50
+
+# Database - Pastikan HOST sesuai dengan nama service di docker-compose
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=iot_db
+DB_USERNAME=root
+DB_PASSWORD=root  # Sesuaikan dengan password di docker-compose.yml
+
+# Session & Cache
+SESSION_DRIVER=database
+QUEUE_CONNECTION=database
+CACHE_STORE=file
+
+# Token untuk Mikrokontroler
+IOT_API_TOKEN=EgazblFsSTOTlezzLP4kQGaoEl6km2BFfVg4Kvf7Uk

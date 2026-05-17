@@ -5,23 +5,34 @@ services:
       dockerfile: Dockerfile
     container_name: laravel_app
     ports:
-      - 8000:8000
+      - 80:8000 # Mengarahkan port 80 VPS ke 8000 FrankenPHP
     env_file:
       - .env
     volumes:
+      - ./:/var/www/html
       - ./.env:/var/www/html/.env:ro
     restart: unless-stopped
     networks:
       - shared-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    depends_on:
+      - db
     mem_limit: 512m
-    memswap_limit: 512m
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: iot_db
+      MYSQL_ROOT_PASSWORD: root # Pastikan sama dengan di .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - shared-network
 
 networks:
   shared-network:
     external: true
+
+volumes:
+  mysql_data:

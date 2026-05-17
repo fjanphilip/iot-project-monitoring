@@ -9,7 +9,7 @@ class SensorExportController extends Controller
 {
     public function exportCsv()
     {
-        $filename = 'sensor-data.csv';
+        $filename = "sensor-data.csv";
 
         $headers = [
             "Content-Type" => "text/csv",
@@ -17,27 +17,27 @@ class SensorExportController extends Controller
         ];
 
         $callback = function () {
-            $handle = fopen('php://output', 'w');
+            $handle = fopen("php://output", "w");
 
             // Header CSV
             fputcsv($handle, [
-                'Temperature',
-                'Air Humidity',
-                'Soil Moisture',
-                'Fan PWM',
-                'Pump PWM',
-                'UV Lamp',
-                'Created At'
+                "Temperature",
+                "Air Humidity",
+                "Soil Moisture",
+                "Fan PWM",
+                "Pump PWM",
+                "UV Lamp",
+                "Created At",
             ]);
 
-            // Ambil semua data terbaru
-            foreach (Sensor::latest()->get() as $sensor) {
+            // Ambil semua data terbaru secara lazy untuk efisiensi memori
+            foreach (Sensor::latest()->lazy() as $sensor) {
                 fputcsv($handle, [
                     $sensor->temperature,
                     $sensor->air_humidity,
                     $sensor->soil_moisture,
-                    $sensor->fan_pwm,   // sebelumnya fan
-                    $sensor->pump_pwm,  // tambahan pump
+                    $sensor->fan_pwm, // sebelumnya fan
+                    $sensor->pump_pwm, // tambahan pump
                     $sensor->uv_lamp,
                     $sensor->created_at,
                 ]);

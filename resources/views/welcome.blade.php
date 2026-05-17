@@ -274,7 +274,7 @@
                     </div>
                     <div class="flex items-center gap-2 text-xs text-gray-500">
                         <i class="fas fa-circle text-[6px]"></i>
-                        <span>SHT20 Reading</span>
+                        <span>SHT2s Reading</span>
                     </div>
                 </div>
 
